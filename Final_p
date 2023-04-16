@@ -1,0 +1,200 @@
+# -*- coding: utf-8 -*-
+import turtle
+import random
+from threading import Timer
+from tkinter import *
+from tkinter import messagebox
+
+turtle.register_shape("./Normal_Mario.gif")
+turtle.register_shape("./Normal_Luigi.gif")
+turtle.register_shape("./Normal_Peach.gif")
+turtle.register_shape("./Victory_Mario.gif")
+turtle.register_shape("./Victory_Luigi.gif")
+turtle.register_shape("./Victory_Peach.gif")
+turtle.register_shape("./Depress_Mario.gif")
+turtle.register_shape("./Depress_Luigi.gif")
+turtle.register_shape("./Depress_Peach.gif")
+1,The company's 3 biggest customers have all announced they will be moving all of their business to a competitor,0.9
+2,The company's newest product continues to set sales records across the industry,1.03
+3,The US government has announced a high-profile investigation into the company's health & safety practices,0.95
+4,CEO Resigns Amidst Allegations of Misconduct and Ethics Violations,0.94
+5,Company Reports Strong Earnings, Far Exceeding Analysts' Expectation,1.12
+6,New Report Finds The Company is Quickly Gaining Market Share,1.04
+7,The organization has been named the fastest growing company in the industry,1.01
+8,The company announces major investments in marketing to boost brand awareness,1.00
+9,The company's Chief Financial Officer named one of Chicago's nicest people,1.00
+10,The company announced plans to expand into a lucrative new market,1.02
+11,Investment firm announced they purchased enough shares to become the majority share holder,0.97
+12,CEO of the company for the past 14 years has announced that they would be retiring,0.98
+13,Company announces laying off 4% of workers,0.97
+14,Company Declares Bankruptcy,0
+account=100000
+price=165.21
+stock=0
+root=Toplevel()
+root.withdraw()
+
+def createBtn(onclick,x, y,width, height, color="gray", shape="square", message= ""):
+    button=turtle.Turtle()
+    button.penup()
+    button.speed(0)
+    button.fillcolor(color)
+    button.shape(shape)
+    button.setpos(x,y)
+    button.shapesize(width,height)
+    button.onclick(onclick)
+    if(message!=""):
+        button.write(message, font=("Arial", 12, "normal"))
+
+def startPage():
+    global character
+    turtle.clearscreen()
+    turtle.penup()
+    turtle.speed(0)
+    turtle.hideturtle()
+
+    turtle.setpos(-30,50)
+    turtle.write("Pick One",font=("Arial", 25,"normal"))
+
+    turtle.setpos(-100,-20)    
+    turtle.shape("./Normal_Mario.gif")
+    turtle.stamp()
+    def marioClick(y,x):
+        if(x>-100 or x<-96 or y>-100 or y<-98):
+            character="Mario"
+            ingame(character)
+    createBtn(marioClick, -100, -100, 4, 2, "gray", message="pick")
+
+    turtle.setpos(0,-20)
+    turtle.shape("./Normal_Luigi.gif")
+    turtle.stamp()
+    def luigiClick(y,x):
+        if(x>0 or x<4 or y>-100 or y<-98):
+            character="Luigi"
+            ingame(character)
+    createBtn(luigiClick, 0, -100, 4, 2, "gray", message="pick")
+
+    turtle.setpos(100,-20)
+    turtle.shape("./Normal_Peach.gif")
+    turtle.stamp()
+    def peachClick(y,x):
+        if(x>100 or x<104 or y>-100 or y<-98):
+            character="Peach"
+            ingame(character)
+    createBtn(peachClick, 100, -100, 4, 2, "gray", message="pick")
+
+def ingame(character,turn=1):
+    global price
+    global account
+    global stock
+    event=random.randint(int(-price),5000)
+    while(event==0):
+        event=random.randint(int(-price),5000)
+    if turn==1:
+        event=0
+    turtle.clearscreen()
+
+    turtle.penup()
+    turtle.speed(0)
+    turtle.hideturtle()
+
+    turtle.setpos(-30,200)
+    turtle.write("TESLA",font=("Arial", 30,"normal"))
+
+    turtle.setpos(-100,160)
+    if turn==1:
+        turtle.write("event: 구매 또는 판매를 해주세요.",font=("Arial", 20,"normal"))
+    elif event>0:
+        turtle.write("event: $"+str(event)+" 상승!",font=("Arial", 20,"normal"))
+    elif event<0:
+        turtle.write("event: $"+str(event)+" 하락!",font=("Arial", 20,"normal"))
+    price=price+event
+
+    turtle.setpos(200,160)
+    turtle.write("turn: "+str(turn),font=("Arial", 20,"normal"))
+
+    turtle.setpos(-50, 100)
+    turtle.write("현재 가치: "+str(price),font=("Arial", 22,"normal"))
+    
+    turtle.setpos(-150, 0)
+    if turn==1:
+        turtle.shape("./Normal_"+character+".gif")
+    elif event>0:
+        turtle.shape("./Victory_"+character+".gif")
+    elif event<0:
+        turtle.shape("./Depress_"+character+".gif")
+    turtle.stamp()
+
+    turtle.setpos(-20,0)
+    turtle.write("잔고: "+str(account),font=("Arial", 18,"normal"))
+
+    turtle.setpos(-20,-60)
+    turtle.write("현재 주식 보유수: "+str(stock),font=("Arial", 18,"normal"))
+
+    def onBuy(y,x):
+        global account, price, stock
+        if(x>200 or x<202 or y>0 or y<2):
+            count= int(turtle.textinput("갯수를 입력해주세요","구매 갯수"))
+            if(count>=20):
+                messagebox.showinfo("","20개 이상 구매할 수 없습니다.")
+            elif(account<price*count):
+                messagebox.showinfo("","잔고가 부족합니다.")
+            else:
+                account=account-price*count
+                stock=stock+count
+            
+    createBtn(onBuy,200,0,2,2,"blue",message="구매")
+    def onSell(y,x):
+        global account, price, stock
+        if(x>200 or x<202 or y>-60 or y<-58):
+            count= int(turtle.textinput("갯수를 입력해주세요","판매 갯수"))
+            if(stock<count):
+                messagebox.showinfo("","보유 주식 개수가 부족합니다.")
+            else:
+                account=account+price*count
+                stock=stock-count
+    createBtn(onSell,200,-60,2,2,"red",message="판매")
+
+    if turn!=10:
+        t=Timer(10, ingame,[character,turn+1])
+        t.start()
+    else:
+        t=Timer(10, finish,[character,account, stock, price])
+        t.start()
+
+def finish(character, account, stock, price):
+    turtle.clearscreen()
+
+    turtle.penup()
+    turtle.speed(0)
+    turtle.hideturtle()
+
+    total=account+stock*price
+
+    turtle.setpos(-30,200)
+    if(total>100000):
+        turtle.write("Victory",font=("Arial", 22,"normal"))
+        turtle.shape("./Victory_"+character+".gif")
+    else:
+        turtle.write("Lose",font=("Arial", 22,"normal"))
+        turtle.shape("./Depress_"+character+".gif")
+
+    turtle.setpos(-100,150)
+    turtle.stamp()
+    
+    turtle.setpos(10,130)
+    turtle.write("$"+str(total-100000),font=("Arial", 20,"normal"))
+
+
+if __name__=="__main__":
+    canvas= turtle.Screen().getcanvas()
+
+    turtle.title("주식게임")
+    turtle.screensize(500,500)
+    turtle.penup()
+    turtle.speed(0)
+    turtle.hideturtle()
+
+    startPage()
+
+    turtle.done()
